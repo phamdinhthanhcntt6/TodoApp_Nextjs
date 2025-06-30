@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: todoapp-nextjs
+    runtime: node
+    repo: https://github.com/phamdinhthanhcntt6/TodoApp_Nextjs
+    branch: main
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://todoapp-nodejs-eyr6.onrender.com
+    plan: free
