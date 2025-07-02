@@ -5,5 +5,5 @@ export default function Home() {
     <div className="p-1">
       <Button>Click me</Button>
     </div>
-  )
+  );
 }

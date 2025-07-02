@@ -12,8 +12,8 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
-      if (token) config.headers.Authorization = `Bearer ${token}`;
+      const acesstoken = localStorage.getItem("acesstoken");
+      if (acesstoken) config.headers.Authorization = `Bearer ${acesstoken}`;
     }
     return config;
   },
@@ -26,7 +26,7 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       if (typeof window !== "undefined") {
-        localStorage.removeItem("token");
+        localStorage.removeItem("acesstoken");
         window.location.href = "/login";
       }
     }
