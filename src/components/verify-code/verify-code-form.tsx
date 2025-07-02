@@ -6,11 +6,12 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { sendOTP, verifyOTP } from "@/service/user";
 import { Loader2Icon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { verifyOTP } from "@/service/user";
-import useAuthStore from "../../zustand/useAuthStore";
 import { toast } from "sonner";
+import useAuthStore from "../../zustand/useAuthStore";
 
 const VerifyCodeForm = () => {
   const [timeOut, setTimeOut] = useState<number>(60);
@@ -21,12 +22,31 @@ const VerifyCodeForm = () => {
 
   const { email } = useAuthStore();
 
+  const router = useRouter();
+
   const verifyCode = async () => {
     try {
+      if (!code) return;
       setIsLoading(true);
       const res = await verifyOTP(email, code);
       toast.success(res.data.message);
+      router.push("/register-user");
     } catch (error) {
+      toast.error("Invalid code or expired");
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resendCode = async (email: string) => {
+    try {
+      setTimeOut(60);
+      setIsLoading(true);
+      await sendOTP(email);
+      toast.success("Code sent successfully");
+    } catch (error) {
+      toast.error("Failed to send code");
       console.log(error);
     } finally {
       setIsLoading(false);
@@ -71,7 +91,7 @@ const VerifyCodeForm = () => {
           variant={"ghost"}
           disabled={timeOut > 0}
           onClick={() => {
-            setTimeOut(60);
+            resendCode(email);
           }}
         >
           Resend

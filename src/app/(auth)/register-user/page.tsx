@@ -1,5 +1,5 @@
 import Logo from "@/components/global/logo";
-import RegisterForm from "@/components/register/register-form";
+import RegisterUserForm from "@/components/register-user/register-user-form";
 import {
   Card,
   CardContent,
@@ -14,20 +14,26 @@ export const metadata = {
   title: "Register",
 };
 
-const RegisterPage = () => {
+const RegisterUserPage = () => {
   return (
     <Card className="w-full max-w-sm max-md:p-2">
       <CardHeader className="space-y-1">
         <Logo />
         <CardTitle className="text-center">Register</CardTitle>
         <CardDescription className="text-center">
-          Enter your email to verify.
+          Create an account to get started.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <RegisterForm />
+        <RegisterUserForm />
       </CardContent>
-      <CardFooter className="flex justify-center items-center text-center">
+      <CardFooter className="flex justify-center items-center text-center flex-col">
+        <div className="text-sm">
+          Do you change your email?&nbsp;
+          <Link className="font-bold" href="/register">
+            Change email
+          </Link>
+        </div>
         <div className="text-sm">
           Do you have an account?&nbsp;
           <Link className="font-bold" href="/login">
@@ -39,4 +45,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
+export default RegisterUserPage;

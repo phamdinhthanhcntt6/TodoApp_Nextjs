@@ -11,14 +11,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { RegisterBody, RegisterBodyType } from "@/schema/register.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { SendCodeBody, SendCodeBodyType } from "@/schema/user.schema";
 import { sendOTP } from "@/service/user";
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import useAuthStore from "../../zustand/useAuthStore";
 
 const RegisterForm = () => {
@@ -28,15 +28,19 @@ const RegisterForm = () => {
 
   const { setEmail } = useAuthStore();
 
-  const form = useForm<RegisterBodyType>({
-    resolver: zodResolver(RegisterBody),
+  const form = useForm<SendCodeBodyType>({
+    resolver: zodResolver(SendCodeBody),
     defaultValues: { email: "" },
   });
 
-  const onSubmit = async (values: RegisterBodyType) => {
+  const onSubmit = async (values: SendCodeBodyType) => {
     try {
       setIsLoading(true);
       const res = await sendOTP(values.email);
+      if (res.data.status === 400) {
+        toast.error("Email already exists. Please login again.");
+        return;
+      }
       setEmail(values.email);
       toast.success(res.data.message);
       setIsLoading(false);
@@ -70,7 +74,7 @@ const RegisterForm = () => {
             {isLoading ? (
               <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
             ) : null}
-            Register
+            Send Code
           </Button>
         </div>
       </form>
