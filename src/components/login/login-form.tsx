@@ -2,6 +2,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -11,39 +12,34 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { RegisterBody, RegisterBodyType } from "@/schema/user.schema";
-import { register } from "@/service/user";
-import useAuthStore from "@/zustand/useAuthStore";
+import { LoginBody, LoginBodyType } from "@/schema/user.schema";
+import { login } from "@/service/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-const RegisterUserForm = () => {
+const LoginForm = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { email } = useAuthStore();
+  const router = useRouter();
 
-  const form = useForm<RegisterBodyType>({
-    resolver: zodResolver(RegisterBody),
+  const form = useForm<LoginBodyType>({
+    resolver: zodResolver(LoginBody),
     defaultValues: {
-      email: `${email}`,
-      username: "",
+      email: "",
       password: "",
-      confirmPassword: "",
     },
   });
 
-  const onSubmit = async (values: RegisterBodyType) => {
+  const onSubmit = async (values: LoginBodyType) => {
     try {
-      if (values.password !== values.confirmPassword) {
-        toast.error("Password not match");
-        return;
-      }
       setIsLoading(true);
-      const res = await register(values);
+      const res = await login(values);
       toast.success(res.data.message);
+      router.push("/dashboard");
     } catch (error: any) {
       console.log(error);
       toast.error(error.message);
@@ -70,20 +66,7 @@ const RegisterUserForm = () => {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="username"
-            rules={{ required: true }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder="Username" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
           <FormField
             control={form.control}
             name="password"
@@ -98,24 +81,26 @@ const RegisterUserForm = () => {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            rules={{ required: true }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm password</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Confirm password"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
+          <div className="flex flex-row items-center gap-x-2">
+            <FormField
+              control={form.control}
+              name="rememberMe"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox
+                      defaultChecked={true}
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="text-sm font-semibold">Remember me</div>
+          </div>
 
           <Button type="submit" disabled={isLoading}>
             {isLoading ? (
@@ -129,4 +114,4 @@ const RegisterUserForm = () => {
   );
 };
 
-export default RegisterUserForm;
+export default LoginForm;

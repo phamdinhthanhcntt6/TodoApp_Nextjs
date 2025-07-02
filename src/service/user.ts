@@ -1,4 +1,4 @@
-import { RegisterBodyType } from "@/schema/user.schema";
+import { LoginBodyType, RegisterBodyType } from "@/schema/user.schema";
 import axios from "../config/axios-instance";
 
 const sendOTP = (email: string) => {
@@ -13,4 +13,8 @@ const register = (body: RegisterBodyType) => {
   return axios.post("/user/register", body);
 };
 
-export { sendOTP, verifyOTP, register };
+const login = (body: LoginBodyType) => {
+  return axios.post("/user/login", body);
+};
+
+export { login, register, sendOTP, verifyOTP };

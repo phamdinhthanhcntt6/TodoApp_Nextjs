@@ -16,7 +16,6 @@ const RegisterBody = z.object({
     .string()
     .min(6, "Password must be at least 6 characters")
     .optional(),
-  isRemember: z.boolean().optional(),
 });
 
 type RegisterBodyType = z.infer<typeof RegisterBody>;
@@ -24,14 +23,9 @@ type RegisterBodyType = z.infer<typeof RegisterBody>;
 export { RegisterBody, type RegisterBodyType };
 
 const LoginBody = z.object({
-  email: z.string().email("Invalid email format"),
-  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email(),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .optional(),
-  isRemember: z.boolean().optional(),
+  rememberMe: z.boolean().optional(),
 });
 
 type LoginBodyType = z.infer<typeof LoginBody>;
