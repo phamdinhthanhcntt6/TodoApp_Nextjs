@@ -2,19 +2,19 @@ import { LoginBodyType, RegisterBodyType } from "@/schema/user.schema";
 import axios from "../config/axios-instance";
 
 const sendOTP = (email: string) => {
-  return axios.post("/user/send-otp", { email });
+  return axios.post("/auth/send-otp", { email });
 };
 
 const verifyOTP = (email: string, code: string) => {
-  return axios.post("/user/verify-otp", { email, code });
+  return axios.post("/auth/verify-otp", { email, code });
 };
 
 const register = (body: RegisterBodyType) => {
-  return axios.post("/user/register", body);
+  return axios.post("/auth/register", body);
 };
 
 const login = (body: LoginBodyType) => {
-  return axios.post("/user/login", body);
+  return axios.post("/auth/login", body);
 };
 
 export { login, register, sendOTP, verifyOTP };
