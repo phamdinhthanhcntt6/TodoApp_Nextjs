@@ -31,3 +31,13 @@ const LoginBody = z.object({
 type LoginBodyType = z.infer<typeof LoginBody>;
 
 export { LoginBody, type LoginBodyType };
+
+interface UserResType {
+  _id: string;
+  email: string;
+  username: string;
+  avatar: string;
+  status: string;
+}
+
+export { type UserResType };

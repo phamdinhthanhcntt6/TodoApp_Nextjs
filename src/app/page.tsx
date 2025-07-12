@@ -33,7 +33,7 @@ export default function HomePage() {
           <h1 className="text-4xl font-bold text-black dark:text-white">
             Welcome to Todo App
           </h1>
-          <p className="text-lg text-black dark:text-white">
+          <p className="text-base font-semibold text-black dark:text-white">
             A simple todo app to help you manage your tasks.
           </p>
           <Link href={"/register"}>

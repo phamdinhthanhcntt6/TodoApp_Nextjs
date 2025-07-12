@@ -1,5 +1,5 @@
+import axios from "@/config/axios-instance";
 import { LoginBodyType, RegisterBodyType } from "@/schema/user.schema";
-import axios from "../config/axios-instance";
 
 const sendOTP = (email: string) => {
   return axios.post("/auth/send-otp", { email });
@@ -17,4 +17,12 @@ const login = (body: LoginBodyType) => {
   return axios.post("/auth/login", body);
 };
 
-export { login, register, sendOTP, verifyOTP };
+const getProfile = (id: string) => {
+  return axios.get("/auth/profile", {
+    params: {
+      id,
+    },
+  });
+};
+
+export { getProfile, login, register, sendOTP, verifyOTP };

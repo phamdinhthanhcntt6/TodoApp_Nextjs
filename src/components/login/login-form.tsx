@@ -15,12 +15,12 @@ import { Input } from "@/components/ui/input";
 import { LoginBody, LoginBodyType } from "@/schema/user.schema";
 import { login } from "@/service/user";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Cookies from "js-cookie";
 import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import Cookies from "js-cookie";
 
 const LoginForm = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -42,6 +42,7 @@ const LoginForm = () => {
       toast.success(res.data.message);
       Cookies.set("accessToken", res.data.accessToken);
       Cookies.set("refreshToken", res.data.refreshToken);
+      Cookies.set("id", res.data.user._id);
       router.push("/dashboard");
     } catch (error: any) {
       console.log(error);
