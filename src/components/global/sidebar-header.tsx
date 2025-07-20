@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -47,7 +48,7 @@ const SidebarHeaderComponent = () => {
     if (id) {
       getProfle(id);
     }
-  }, [id]);
+  }, []);
 
   return (
     <SidebarMenu>

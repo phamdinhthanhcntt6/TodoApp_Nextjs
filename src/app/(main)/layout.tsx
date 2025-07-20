@@ -8,7 +8,7 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
       <Suspense fallback={<p>Loading...</p>}>
         <SidebarProvider className="flex flex-row">
           <AppSidebar />
-          <main className="h-screen overflow-y-auto w-full p-4">
+          <main className="h-screen overflow-y-auto w-full">
             {children}
           </main>
         </SidebarProvider>
