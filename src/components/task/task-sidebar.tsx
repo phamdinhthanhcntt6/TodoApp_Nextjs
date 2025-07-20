@@ -108,7 +108,7 @@ const TaskSidebar = () => {
               <div className="flex flex-col w-full">
                 {item.children.map((child: any) => (
                   <div
-                    onClick={() => setTabTask(child.key)}
+                    onClick={() => setTabTask(child.name)}
                     key={child.key}
                     className={`rounded-md px-4 py-1 cursor-pointer items-center capitalize font-semibold ${
                       tabTask === child.name && "bg-black text-white "
