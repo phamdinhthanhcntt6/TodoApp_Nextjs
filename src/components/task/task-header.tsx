@@ -8,8 +8,8 @@ const TaskHeader = () => {
   const { tabTask, collapse, openCollapse } = useTaskStore();
 
   return (
-    <>
-      <div className="p-4 w-full items-center border-b-[1px] border-slate-300 ">
+    <div className="w-full border-b-[1px] border-slate-300">
+      <div className="p-4 w-full items-center">
         <div className="flex flex-row items-center gap-x-3">
           {!collapse && (
             <div className="">
@@ -33,7 +33,7 @@ const TaskHeader = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -13,17 +13,63 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { TaskListBodyType, TaskListResType } from "@/schema/taskList.schema";
+import {
+  createTaskList,
+  getTaskLists,
+  removeTaskList,
+  updateTaskList,
+} from "@/service/taskList";
 import useTaskStore from "@/zustand/useTaskStore";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import {
   ArrowLeftFromLine,
   BookCheck,
+  Ellipsis,
   Folder,
+  PencilLine,
   Plus,
   Star,
+  Trash2,
   User,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
+const tabs = [
+  { key: 1, name: "owner", icon: User },
+  { key: 2, name: "subscribed", icon: Star },
+];
+
+const statusTask = [
+  {
+    label: "Quick Access",
+    children: [
+      {
+        key: "all-task",
+        name: "All task",
+      },
+      {
+        key: "created",
+        name: "Created",
+      },
+      {
+        key: "assigned",
+        name: "Assigned",
+      },
+      {
+        key: "completed",
+        name: "Completed",
+      },
+    ],
+  },
+];
 interface ITab {
   key: number;
   name: string;
@@ -31,40 +77,76 @@ interface ITab {
 }
 
 const TaskSidebar = () => {
-  const { collapse, closeCollapse, tabTask, setTabTask } = useTaskStore();
+  const {
+    collapse,
+    closeCollapse,
+    tabTask,
+    setTabTask,
+    taskList,
+    setTaskList,
+  } = useTaskStore();
 
-  const tabs = [
-    { key: 1, name: "owner", icon: User },
-    { key: 2, name: "subscribed", icon: Star },
-  ];
+  const [taskLists, setTaskLists] = useState<TaskListResType[]>([]);
+  const [editingId, setEditingId] = useState<string | null>();
+  const [editingValue, setEditingValue] = useState<string>("");
 
-  const statusTask = [
-    {
-      label: "Quick Access",
-      children: [
-        {
-          key: "all-task",
-          name: "All task",
-        },
-        {
-          key: "created",
-          name: "Created",
-        },
-        {
-          key: "assigned",
-          name: "Assigned",
-        },
-        {
-          key: "completed",
-          name: "Completed",
-        },
-      ],
-    },
-  ];
+  const create = async () => {
+    const body = {
+      name: `Task List ${taskLists.length + 1}`,
+      owner: "6865776553b24a4e18962aaf",
+      members: ["6865776553b24a4e18962aaf"],
+    };
+    try {
+      const res = await createTaskList(body);
+      toast.success(res.data.message);
+      getList();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getList = async () => {
+    try {
+      const res = await getTaskLists("6865776553b24a4e18962aaf");
+      if (res.data) {
+        setTaskLists(res.data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const remove = async (id: string) => {
+    try {
+      const res = await removeTaskList(id);
+      toast.success(res.data.message);
+      getList();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const update = async (id: string, body: TaskListBodyType) => {
+    try {
+      const res = await updateTaskList(id, {
+        name: body.name,
+        members: body.members,
+        owner: body.owner,
+      });
+      toast.success(res.data.message);
+      getList();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getList();
+  }, []);
 
   return (
     <div
-      className={`h-screen p-4 w-1/5 mt-1 border-r-2 ${
+      className={`h-screen p-4 w-[280px] border-r-2 ${
         !collapse && "hidden"
       } flex flex-col gap-y-2`}
     >
@@ -134,8 +216,8 @@ const TaskSidebar = () => {
                 <Plus />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>
+            <DropdownMenuContent side="right" align="start">
+              <DropdownMenuItem onClick={create}>
                 <Plus /> New Task
               </DropdownMenuItem>
               <DropdownMenuItem>
@@ -144,6 +226,87 @@ const TaskSidebar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+      </div>
+      <div className="pl-7">
+        {taskLists.map((item: TaskListResType) => (
+          <div
+            key={item._id}
+            onClick={() => {
+              setTaskList(item._id);
+              setTabTask(item.name);
+            }}
+            className={`flex flex-row items-center justify-between w-full rounded-sm my-1 cursor-pointer p-1 pr-3 hover:bg-slate-100 ${
+              taskList === item._id ? "!bg-black text-white" : ""
+            }}`}
+          >
+            <div
+              className={`font-semibold text-sm flex gap-x-1 ${
+                taskList === item._id ? "!text-white" : ""
+              }`}
+            >
+              {editingId === item._id ? (
+                <Input
+                  autoFocus
+                  value={editingValue}
+                  onChange={(e) => {
+                    setEditingValue(e.target.value);
+                  }}
+                  onBlur={() => {
+                    if (editingValue.trim() !== item.name) {
+                      update(item._id, {
+                        ...item,
+                        name: editingValue,
+                      });
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      if (editingValue.trim() !== item.name) {
+                        update(item._id, {
+                          ...item,
+                          name: editingValue,
+                        });
+                      }
+                      setEditingId(null);
+                    }
+                  }}
+                  className="h-7 px-2 py-1 text-sm bg-white text-black"
+                />
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger className="flex flex-row">
+                    <BookCheck />
+                    &nbsp;
+                    <span className="line-clamp-1">{item.name}</span>
+                  </TooltipTrigger>
+                  <TooltipContent>{item.name}</TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Ellipsis
+                  size={12}
+                  color={taskList === item._id ? "white" : "black"}
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="right" align="start">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setEditingId(item._id);
+                    setEditingValue(item.name);
+                  }}
+                >
+                  <PencilLine /> Rename
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => remove(item._id)}>
+                  <Trash2 /> Remove
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ))}
       </div>
     </div>
   );
