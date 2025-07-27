@@ -163,7 +163,10 @@ const TaskSidebar = () => {
       <div className="flex flex-col w-full">
         {tabs.map((item: ITab) => (
           <div
-            onClick={() => setTabTask(item.name)}
+            onClick={() => {
+              setTaskList("");
+              setTabTask(item.name);
+            }}
             key={item.key}
             className={`px-4 flex flex-row py-1 cursor-pointer items-center capitalize text-sm font-semibold ${
               tabTask === item.name &&
@@ -190,7 +193,10 @@ const TaskSidebar = () => {
               <div className="flex flex-col w-full">
                 {item.children.map((child: any) => (
                   <div
-                    onClick={() => setTabTask(child.name)}
+                    onClick={() => {
+                      setTaskList("");
+                      setTabTask(child.name);
+                    }}
                     key={child.key}
                     className={`rounded-md px-4 py-1 cursor-pointer items-center capitalize font-semibold ${
                       tabTask === child.name && "bg-black text-white "
@@ -278,7 +284,9 @@ const TaskSidebar = () => {
                   <TooltipTrigger className="flex flex-row">
                     <BookCheck />
                     &nbsp;
-                    <span className="line-clamp-1">{item.name}</span>
+                    <span className="line-clamp-1 cursor-pointer">
+                      {item.name}
+                    </span>
                   </TooltipTrigger>
                   <TooltipContent>{item.name}</TooltipContent>
                 </Tooltip>
