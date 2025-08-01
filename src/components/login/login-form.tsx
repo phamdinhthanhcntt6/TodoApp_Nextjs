@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { LoginBody, LoginBodyType } from "@/schema/user.schema";
 import { login } from "@/service/user";
+import useAuthStore from "@/zustand/useAuthStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Cookies from "js-cookie";
 import { Loader2Icon } from "lucide-react";
@@ -24,6 +25,8 @@ import { toast } from "sonner";
 
 const LoginForm = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const { setCurrentUserId } = useAuthStore();
 
   const router = useRouter();
 
@@ -42,7 +45,9 @@ const LoginForm = () => {
       toast.success(res.data.message);
       Cookies.set("accessToken", res.data.accessToken);
       Cookies.set("refreshToken", res.data.refreshToken);
-      Cookies.set("id", res.data.user._id);
+      if (res.data.user._id) {
+        setCurrentUserId(res.data.user._id);
+      }
       router.push("/dashboard");
     } catch (error: any) {
       console.log(error);

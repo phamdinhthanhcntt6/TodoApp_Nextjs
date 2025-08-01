@@ -27,6 +27,7 @@ import {
   removeTaskList,
   updateTaskList,
 } from "@/service/taskList";
+import useAuthStore from "@/zustand/useAuthStore";
 import useTaskStore from "@/zustand/useTaskStore";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import {
@@ -73,6 +74,8 @@ const TaskSidebar = () => {
   const { collapse, closeCollapse, setTaskListName, setTabTaskName } =
     useTaskStore();
 
+  const { currentUserId } = useAuthStore();
+
   const params = useParams();
   const task_list_id = params?.task_list_id;
   const tab_task = params?.tabtask;
@@ -97,8 +100,8 @@ const TaskSidebar = () => {
   const create = async () => {
     const body = {
       name: `Task List ${taskLists.length + 1}`,
-      owner: "6865776553b24a4e18962aaf",
-      members: ["6865776553b24a4e18962aaf"],
+      owner: currentUserId,
+      members: [currentUserId],
     };
     try {
       const res = await createTaskList(body);
@@ -111,7 +114,7 @@ const TaskSidebar = () => {
 
   const getList = async () => {
     try {
-      const res = await getTaskLists("6865776553b24a4e18962aaf");
+      const res = await getTaskLists(currentUserId);
       if (res.data) {
         setTaskLists(res.data.data);
       }
@@ -189,15 +192,15 @@ const TaskSidebar = () => {
 
       <div className="border-b-2" />
 
-      {statusTask.map((item: any) => (
+      {statusTask.map((item: any, index: number) => (
         <Accordion
           type="single"
           collapsible
           className="w-full"
           key={item.label}
-          defaultValue="item-1"
+          defaultValue="0"
         >
-          <AccordionItem value="item-1">
+          <AccordionItem value={index.toString()}>
             <AccordionTrigger>{item.label}</AccordionTrigger>
             <AccordionContent>
               <div className="flex flex-col w-full">
@@ -206,8 +209,8 @@ const TaskSidebar = () => {
                     onClick={() => {
                       setTaskListId(undefined);
                       setTabTask(child.key);
-                      setTabTaskName(child.name); // Sửa: tên hiển thị trong header
-                      setTaskListName(""); // Sửa: reset tên task list
+                      setTabTaskName(child.name);
+                      setTaskListName("");
                       router.push(`/task/${child.key}`);
                     }}
                     key={child.key}
