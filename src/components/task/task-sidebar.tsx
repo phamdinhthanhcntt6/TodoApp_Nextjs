@@ -1,6 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Accordion,
   AccordionContent,
@@ -39,56 +40,59 @@ import {
   Trash2,
   User,
 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const tabs = [
-  { key: 1, name: "owner", icon: User },
-  { key: 2, name: "subscribed", icon: Star },
+  { key: 1, name: "owner", icon: User, url: "owner" },
+  { key: 2, name: "subscribed", icon: Star, url: "subcribed" },
 ];
 
 const statusTask = [
   {
     label: "Quick Access",
     children: [
-      {
-        key: "all-task",
-        name: "All task",
-      },
-      {
-        key: "created",
-        name: "Created",
-      },
-      {
-        key: "assigned",
-        name: "Assigned",
-      },
-      {
-        key: "completed",
-        name: "Completed",
-      },
+      { key: "all-task", name: "All task" },
+      { key: "created", name: "Created" },
+      { key: "assigned", name: "Assigned" },
+      { key: "completed", name: "Completed" },
     ],
   },
 ];
+
 interface ITab {
   key: number;
   name: string;
   icon: any;
+  url: string;
 }
 
 const TaskSidebar = () => {
-  const {
-    collapse,
-    closeCollapse,
-    tabTask,
-    setTabTask,
-    taskList,
-    setTaskList,
-  } = useTaskStore();
+  const router = useRouter();
+  const { collapse, closeCollapse, setTaskListName, setTabTaskName } =
+    useTaskStore();
+
+  const params = useParams();
+  const task_list_id = params?.task_list_id;
+  const tab_task = params?.tabtask;
 
   const [taskLists, setTaskLists] = useState<TaskListResType[]>([]);
   const [editingId, setEditingId] = useState<string | null>();
   const [editingValue, setEditingValue] = useState<string>("");
+  const [taskListId, setTaskListId] = useState<string | undefined>(undefined);
+  const [tabTask, setTabTask] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (tab_task) {
+      setTabTask(tab_task as string);
+      setTaskListId(undefined);
+      setTabTaskName(tab_task as string);
+    } else if (task_list_id) {
+      setTaskListId(task_list_id as string);
+      setTabTask(undefined);
+    }
+  }, [tab_task, task_list_id]);
 
   const create = async () => {
     const body = {
@@ -160,12 +164,16 @@ const TaskSidebar = () => {
         </div>
         <div className="font-bold text-xl">Tasks</div>
       </div>
+
       <div className="flex flex-col w-full">
         {tabs.map((item: ITab) => (
           <div
             onClick={() => {
-              setTaskList("");
+              setTaskListId(undefined);
               setTabTask(item.name);
+              setTabTaskName(item.name);
+              setTaskListName("");
+              router.push(`/task/${item.url}`);
             }}
             key={item.key}
             className={`px-4 flex flex-row py-1 cursor-pointer items-center capitalize text-sm font-semibold ${
@@ -178,7 +186,9 @@ const TaskSidebar = () => {
           </div>
         ))}
       </div>
+
       <div className="border-b-2" />
+
       {statusTask.map((item: any) => (
         <Accordion
           type="single"
@@ -194,13 +204,16 @@ const TaskSidebar = () => {
                 {item.children.map((child: any) => (
                   <div
                     onClick={() => {
-                      setTaskList("");
-                      setTabTask(child.name);
+                      setTaskListId(undefined);
+                      setTabTask(child.key);
+                      setTabTaskName(child.name); // Sửa: tên hiển thị trong header
+                      setTaskListName(""); // Sửa: reset tên task list
+                      router.push(`/task/${child.key}`);
                     }}
                     key={child.key}
                     className={`rounded-md px-4 py-1 cursor-pointer items-center capitalize font-semibold ${
-                      tabTask === child.name && "bg-black text-white "
-                    }}`}
+                      tabTask === child.key && "bg-black text-white"
+                    }`}
                   >
                     {child.name}
                   </div>
@@ -210,7 +223,9 @@ const TaskSidebar = () => {
           </AccordionItem>
         </Accordion>
       ))}
+
       <div className="border-b-2" />
+
       <div className="flex flex-col w-full font-semibold">
         <div className="flex items-center justify-between">
           <div className="flex gap-x-1">
@@ -233,46 +248,42 @@ const TaskSidebar = () => {
           </DropdownMenu>
         </div>
       </div>
+
       <div className="pl-7">
         {taskLists.map((item: TaskListResType) => (
           <div
             key={item._id}
             onClick={() => {
-              setTaskList(item._id);
-              setTabTask(item.name);
+              setTaskListId(item._id);
+              setTabTask(undefined);
+              setTabTaskName("");
+              setTaskListName(item.name);
+              router.push(`/task/task-lists/${item._id}`);
             }}
             className={`flex flex-row items-center justify-between w-full rounded-sm my-1 cursor-pointer p-1 pr-3 hover:bg-slate-100 ${
-              taskList === item._id ? "!bg-black text-white" : ""
-            }}`}
+              taskListId === item._id ? "!bg-black text-white" : ""
+            }`}
           >
             <div
               className={`font-semibold text-sm flex gap-x-1 ${
-                taskList === item._id ? "!text-white" : ""
+                taskListId === item._id ? "!text-white" : ""
               }`}
             >
               {editingId === item._id ? (
                 <Input
                   autoFocus
                   value={editingValue}
-                  onChange={(e) => {
-                    setEditingValue(e.target.value);
-                  }}
+                  onChange={(e) => setEditingValue(e.target.value)}
                   onBlur={() => {
                     if (editingValue.trim() !== item.name) {
-                      update(item._id, {
-                        ...item,
-                        name: editingValue,
-                      });
+                      update(item._id, { ...item, name: editingValue });
                     }
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
                       if (editingValue.trim() !== item.name) {
-                        update(item._id, {
-                          ...item,
-                          name: editingValue,
-                        });
+                        update(item._id, { ...item, name: editingValue });
                       }
                       setEditingId(null);
                     }
@@ -296,7 +307,7 @@ const TaskSidebar = () => {
               <DropdownMenuTrigger asChild>
                 <Ellipsis
                   size={12}
-                  color={taskList === item._id ? "white" : "black"}
+                  color={taskListId === item._id ? "white" : "black"}
                 />
               </DropdownMenuTrigger>
               <DropdownMenuContent side="right" align="start">

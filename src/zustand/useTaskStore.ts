@@ -4,20 +4,20 @@ interface TaskState {
   collapse: boolean;
   openCollapse: () => void;
   closeCollapse: () => void;
-  tabTask: string;
-  setTabTask: (tabTask: string) => void;
-  taskList: string;
-  setTaskList: (taskLists: string) => void;
+  tabTaskName: string;
+  setTabTaskName: (tabTask: string) => void;
+  taskListName: string;
+  setTaskListName: (taskList: string) => void;
 }
 
 const useTaskStore = create<TaskState>((set) => ({
   collapse: true,
   openCollapse: () => set({ collapse: true }),
   closeCollapse: () => set({ collapse: false }),
-  tabTask: "owner",
-  setTabTask: (tabTask: string) => set({ tabTask }),
-  taskList: "",
-  setTaskList: (taskList: string) => set({ taskList }),
+  tabTaskName: "owner",
+  setTabTaskName: (tabTaskName: string) => set({ tabTaskName }),
+  taskListName: "",
+  setTaskListName: (taskListName: string) => set({ taskListName }),
 }));
 
 export default useTaskStore;
